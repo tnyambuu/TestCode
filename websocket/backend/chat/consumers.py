@@ -41,3 +41,7 @@ class ChatConsumer(WebsocketConsumer):
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({"message": message}))
+
+    def task_update(self, event):
+        # handles {"type": "task.update", "data": {...}}
+        self.send(text_data=json.dumps(event["data"]))
