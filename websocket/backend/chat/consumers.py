@@ -8,7 +8,9 @@ from channels.generic.websocket import WebsocketConsumer
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = f"chat_{self.room_name}"
+
+        self.room_group_name = f"{self.room_name}"
+        print(f"Room group name: {self.room_group_name}")
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -27,6 +29,10 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
+        print(f"Received message: {text_data}")
+        if not text_data or text_data.strip() == "":
+            print("Received empty message, ignoring")
+            return
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
 
@@ -37,6 +43,8 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from room group
     def chat_message(self, event):
+
+        print(f"Received event: {event}")
         message = event["message"]
 
         # Send message to WebSocket
@@ -44,4 +52,4 @@ class ChatConsumer(WebsocketConsumer):
 
     def task_update(self, event):
         # handles {"type": "task.update", "data": {...}}
-        self.send(text_data=json.dumps(event["data"]))
+        self.send(text_data=json.dumps({"message": event["message"]}))

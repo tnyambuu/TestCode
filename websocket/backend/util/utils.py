@@ -1,14 +1,17 @@
 import time
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 
-async def ws_send(room, data):
-    layer = get_channel_layer()
-    await layer.group_send(f"chat_{room}", {"type": "task.update", "data": data})
+# def ws_send(room, message):
+#     print(f"Sending message: {message} to room: {room}")
+#     layer = get_channel_layer()
+#     layer.group_send(f"{room}", {"type": "task.update", "message": message})
 
 def dump_process(room_name, task_id):
 
+    layer = get_channel_layer()
+
     for count in range(10):
-        print(f"Processing {count} in room {room_name} for task {task_id}")
-        ws_send(room_name, {"task_id": task_id, "message": "Started", "progress": count})
+        async_to_sync(layer.group_send)(f"{room_name}", {"type": "task.update", "message": f"Processing {count + 1} / 10 in room {room_name} for task {task_id}"})
         time.sleep(1)

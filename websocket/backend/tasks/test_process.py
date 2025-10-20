@@ -20,17 +20,18 @@ def run_coro(coro):
 
 async def _ws_send(room, data):
     layer = get_channel_layer()
-    await layer.group_send(f"chat_{room}", {"type": "task.update", "data": data})
+    await layer.group_send(f"{room}", {"type": "task.update", "data": data, "message": data["message"]})
 
 
 @shared_task(bind=True)
 def test_process(self, file_name, room_name):
 
     task_id = getattr(self.request, "id", None)
-    pid = os.getpid()                      # OS process ID
+    pid = os.getpid()
     proc = multiprocessing.current_process().name
 
     # run_coro(_ws_send(room_name, {"task_id": task_id, "message": "Started", "progress": 0}))
+    # _ws_send(room_name, {"task_id": task_id, "message": "Started", "progress": 0})
 
     logging.info(f"Starting task {task_id} for file {file_name}")
     logging.info(f"task_id={task_id} pid={pid} process={proc} file={file_name} room={room_name}")

@@ -26,9 +26,9 @@ export default function Home() {
 
     socket.onopen = () => {
       // Send a test message so the server echoes it back
-      // try {
-      //   socket.send(JSON.stringify({ message: "hello from client" }));
-      // } catch (_) {}
+      try {
+        socket.send(JSON.stringify({ message: "hello from client" }));
+      } catch (_) {}
     };
 
     socket.onmessage = (event) => {
